@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart</title>
+</head>
+<body>
+  <h1>Shopping Cart</h1>
+  <ul id="cart-items">
+    <!-- Cart items will be dynamically inserted here -->
+  </ul>
+  <div>Total: <span id="total">0</span></div>
+  <button onclick="checkout()">Pay Now</button>
+  
+  <script>
+    function renderCart() {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let total = 0;
+      let cartItems = document.getElementById('cart-items');
+      cartItems.innerHTML = '';
+      cart.forEach(item => {
+        total += item.price * item.quantity;
+        cartItems.innerHTML += `<li>${item.item} - $${item.price} - Quantity: ${item.quantity} 
+          <button onclick="incrementQuantity(${item.price}, ${cart.indexOf(item)})">+</button>
+          <button onclick="decrementQuantity(${item.price}, ${cart.indexOf(item)})">-</button>
+        </li>`;
+      });
+      document.getElementById('total').innerText = total.toFixed(2); // Ensure total is displayed as a number with 2 decimal places
+    }
+
+    function checkout() {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let total = 0;
+      let itemList = cart.map(item => `${item.item} - $${item.price} - Quantity: ${item.quantity}`).join('\n');
+      alert(`Items Bought:\n${itemList}`);
+      // Clear the cart after checkout
+      localStorage.removeItem('cart');
+      renderCart(); // Update the cart display
+    }
+
+    function incrementQuantity(price, index) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart[index].quantity++;
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+    }
+
+    function decrementQuantity(price, index) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (cart[index].quantity > 1) {
+        cart[index].quantity--;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+      }
+    }
+
+    window.onload = renderCart;
+  </script>
+</body>
+</html>
